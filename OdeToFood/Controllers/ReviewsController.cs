@@ -1,104 +1,51 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Web;
-//using System.Web.Mvc;
-//using OdeToFood.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using OdeToFood.Models;
 
-//namespace OdeToFood.Controllers
-//{
-//    public class ReviewsController : Controller
-//    {
-//        // GET: Reviews
-//        public ActionResult Index()
-//        {
-//            var model = from r in _myRestaurantReviews
-//                orderby r.Country
-//                select r;
+namespace OdeToFood.Controllers
+{
+    public class ReviewsController : Controller
+    {
+        OdeToFoodDb _db = new OdeToFoodDb();
 
-//            return View(model);
-//        }
+        // GET: Reviews
+        public ActionResult Index([Bind(Prefix="id")]int restaurantId)
+        {
 
-//        // GET: Reviews/Details/5
-//        public ActionResult Details(int id)
-//        {
-//            return View();
-//        }
+            var model = _db.RestaurantReviews.Where(r => r.RestaurantId == restaurantId).ToList();
+            
+            if (model!=null)
+                return View(model);
 
-//        // GET: Reviews/Create
-//        public ActionResult Create()
-//        {
-//            return View();
-//        }
+            return HttpNotFound("NOTA FUNDAKA");
+        }
 
-//        // POST: Reviews/Create
-//        [HttpPost]
-//        public ActionResult Create(FormCollection collection)
-//        {
-//            try
-//            {
-//                // TODO: Add insert logic here
+        [HttpGet]
+        public ActionResult Create(int restaurantId)
+        {
+            return View();
+        }
 
-//                return RedirectToAction("Index");
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
+        [HttpPost]
+        public ActionResult Create(RestaurantReview review)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.RestaurantReviews.Add(review);
+                _db.SaveChanges();
+                return RedirectToAction("Index", new {id = review.RestaurantId});
+            }
 
-//        // GET: Reviews/Edit/5
-//        public ActionResult Edit(int id)
-//        {
-//            return View();
-//        }
+            return View(review);
+        }
 
-//        // POST: Reviews/Edit/5
-//        [HttpPost]
-//        public ActionResult Edit(int id, FormCollection collection)
-//        {
-//            try
-//            {
-//                // TODO: Add update logic here
-
-//                return RedirectToAction("Index");
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-
-//        // GET: Reviews/Delete/5
-//        public ActionResult Delete(int id)
-//        {
-//            return View();
-//        }
-
-//        // POST: Reviews/Delete/5
-//        [HttpPost]
-//        public ActionResult Delete(int id, FormCollection collection)
-//        {
-//            try
-//            {
-//                // TODO: Add delete logic here
-
-//                return RedirectToAction("Index");
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-
-//        private List<RestaurantReview> _myRestaurantReviews = new List<RestaurantReview>
-//        {
-//            new RestaurantReview(){ City = "Barcelona", Id = 1, Country = "Spain", Name = "Ca la Marieta", Rating = "7"},
-//            new RestaurantReview(){ City = "Pamplona", Id = 2,Country = "Spain", Name="Lagunak", Rating= "6"},
-//            new RestaurantReview(){ City = "Lleida", Id = 3,Country = "Spain", Name="La Huerta", Rating= "8"},
-//            new RestaurantReview(){ City = "New York", Id = 4,Country = "USA", Name="Sorpaso", Rating= "8"},
-//             new RestaurantReview(){City = "Buenos Aires", Id = 5, Country = "Argentina", Name = "Zepellon Jr.", Rating = "3"}
-//        };
-
-//    }
-//}
+        protected override void Dispose(bool disposing)
+        {
+            _db.Dispose();
+            base.Dispose(disposing);
+        }
+    }
+}

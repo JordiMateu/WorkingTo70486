@@ -15,5 +15,13 @@ namespace OdeToFood.Models
 
 		public DbSet<Restaurant> Restaurants { get; set; }
 		public DbSet<RestaurantReview> RestaurantReviews { get; set; }
+
+	    public void Dispose()
+	    {
+	        // Dispose of unmanaged resources.
+	        Dispose(true);
+	        // Suppress finalization.
+	        GC.SuppressFinalize(this);
+	    }
 	}
 }
